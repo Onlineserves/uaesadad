@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام عملية السداد</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+        .nav-bar {
+            margin-bottom: 15px;
+        }
+        .nav-bar a {
+            text-decoration: none;
+            color: #158311;
+            font-weight: bold;
+        }
+        .main-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        .input-group {
+            margin-bottom: 25px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #158311;
+            box-shadow: 0 0 0 3px rgba(21, 131, 17, 0.2);
+        }
+        #manualInput {
+            margin-top: 10px;
+        }
+        .service-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #158311;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .service-button:hover {
+            background-color: #126b0e;
+        }
+        @media (max-width: 600px) {
+            .main-section {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="/">الرئيسية / شخصي</a>
+        </div>
+        <form action="/.netlify/functions/submit-payment" method="post" id="paymentForm">
+            <div class="main-section">
+                <h1>إتمام عملية السداد</h1>
+                
+                <div class="input-group">
+                    <label for="bill_number">أدخل رقم الفاتورة</label>
+                    <input type="text" id="bill_number" name="bill_number" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="paymentType">اختر نوع السداد</label>
+                    <select name="payment_type_select" id="paymentType" onchange="toggleManualInput()">
+                        <option value="مدفوعات حكومية">مدفوعات حكومية</option>
+                        <option value="مدفوعات ديوان ملكي">مدفوعات ديوان ملكي</option>
+                        <option value="مدفوعات تأمينات اجتماعية">مدفوعات تأمينات اجتماعية</option>
+                        <option value="مدفوعات الزراعة والبيئة">مدفوعات الزراعة والبيئة</option>
+                        <option value="مدفوعات الجوازات">مدفوعات الجوازات</option>
+                        <option value="مدفوعات مخالفات مكتب العمل">مدفوعات مخالفات مكتب العمل</option>
+                        <option value="رسوم مركبات">رسوم مركبات</option>
+                        <option value="رسوم نقل كفالة">رسوم نقل كفالة</option>
+                        <option value="رسوم تغيير مهنة">رسوم تغيير مهنة</option>
+                        <option value="دفع رسوم تأييد رعاة">دفع رسوم تأييد رعاة</option>
+                        <option value="رسوم تمكين">رسوم تمكين</option>
+                        <option value="مدفوعات مخالفات مرورية">مدفوعات مخالفات مرورية</option>
+                        <option value="استرداد أموال">استرداد اموال</option>
+                        <option value="مدفوعات أخرى">مدفوعات أخرى</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="manualInputGroup" style="display: none;">
+                    <label for="manualInput">أدخل نوع السداد يدويًا</label>
+                    <input type="text" name="payment_type_manual" id="manualInput">
+                </div>
+
+                <div class="input-group">
+                    <label for="amount">قيمة رسوم السداد (درهم إماراتي)</label>
+                    <input type="number" id="amount" name="amount" required>
+                </div>
+
+                <button type="submit" class="service-button">المتابعة والإكمال</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const paymentForm = document.getElementById('paymentForm');
+        const paymentTypeSelect = document.getElementById('paymentType');
+        const manualInputGroup = document.getElementById('manualInputGroup');
+        const manualInput = document.getElementById('manualInput');
+
+        function toggleManualInput() {
+            if (paymentTypeSelect.value === 'مدفوعات أخرى') {
+                manualInputGroup.style.display = 'block';
+                manualInput.focus();
+            } else {
+                manualInputGroup.style.display = 'none';
+                manualInput.value = '';
+            }
+        }
+
+        paymentForm.addEventListener('submit', function(event) {
+            if (paymentTypeSelect.value === 'مدفوعات أخرى' && manualInput.value.trim() === '') {
+                event.preventDefault();
+                alert('يرجى إدخال نوع السداد يدويًا.');
+                manualInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
